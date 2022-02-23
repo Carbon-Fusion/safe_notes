@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -148,31 +149,31 @@ class _NotesPageState extends State<NotesPage> {
                 /* Divider(
               color: Colors.white70,
             ), */
-                const SizedBox(height: 10),
-                buildMenuItem(
-                    text: 'Import Data',
-                    icon: Icons.file_download_outlined,
-                    onClicked: () async {
-                      Navigator.of(context).pop();
-                      await showImportDialog(context);
-                    }),
-                const SizedBox(height: 10),
-                buildMenuItem(
-                    text: 'Export Data',
-                    icon: Icons.file_upload_outlined,
-                    onClicked: () async {
-                      Navigator.of(context).pop();
-                      bool rat = false;
-                      try {
-                        rat = await showExportDialog(context);
-                      } catch (e) {
-                        showSnackBar("File not saved!");
-                        return;
-                      }
-                      if (!rat) return;
-                      await fileSave();
-                      ExportEncryptionControl.setIsExportEncrypted(true);
-                    }),
+                // const SizedBox(height: 10),
+                // buildMenuItem(
+                //     text: 'Import Data',
+                //     icon: Icons.file_download_outlined,
+                //     onClicked: () async {
+                //       Navigator.of(context).pop();
+                //       await showImportDialog(context);
+                //     }),
+                // const SizedBox(height: 10),
+                // buildMenuItem(
+                //     text: 'Export Data',
+                //     icon: Icons.file_upload_outlined,
+                //     onClicked: () async {
+                //       Navigator.of(context).pop();
+                //       bool rat = false;
+                //       try {
+                //         rat = await showExportDialog(context);
+                //       } catch (e) {
+                //         showSnackBar("File not saved!");
+                //         return;
+                //       }
+                //       if (!rat) return;
+                //       await fileSave();
+                //       ExportEncryptionControl.setIsExportEncrypted(true);
+                //     }),
                 const SizedBox(height: 10),
                 buildMenuItem(
                     text: 'Change Passphrase',
@@ -181,14 +182,14 @@ class _NotesPageState extends State<NotesPage> {
                       Navigator.of(context).pop();
                       await changePassphraseDialog(context);
                     }),
-                const SizedBox(height: 10),
-                buildMenuItem(
-                    text: 'UnDecrypted Control',
-                    icon: Icons.settings_sharp,
-                    onClicked: () async {
-                      Navigator.of(context).pop();
-                      await toggleUndecryptionDialog(context);
-                    }),
+                // const SizedBox(height: 10),
+                // buildMenuItem(
+                //     text: 'UnDecrypted Control',
+                //     icon: Icons.settings_sharp,
+                //     onClicked: () async {
+                //       Navigator.of(context).pop();
+                //       await toggleUndecryptionDialog(context);
+                //     }),
                 const SizedBox(height: 10),
                 buildMenuItem(
                   text: 'Dark Mode',
@@ -196,48 +197,48 @@ class _NotesPageState extends State<NotesPage> {
                   toggle: TheamToggle(),
                 ),
                 const SizedBox(height: 5),
-                Divider(
-                  color: Colors.white70,
-                ),
+                // Divider(
+                //   color: Colors.white70,
+                // ),
+                // const SizedBox(height: 5),
+                // buildMenuItem(
+                //     text: 'Help and Feedback',
+                //     icon: Icons.feedback,
+                //     onClicked: () async {
+                //       Navigator.of(context).pop();
+                //       var mailUrl = AppInfo.getMailToForFeedback();
+                //       try {
+                //         await launch(mailUrl);
+                //       } catch (e) {}
+                //     }),
+                // const SizedBox(height: 10),
+                // buildMenuItem(
+                //     text: 'Source Code',
+                //     icon: Icons.folder,
+                //     onClicked: () async {
+                //       var sourceCodeUrl = AppInfo.getSourceCodeUrl();
+                //       try {
+                //         await launch(sourceCodeUrl);
+                //       } catch (e) {}
+                //     }),
+                // const SizedBox(height: 10),
+                // buildMenuItem(
+                //     text: 'Report Bug',
+                //     icon: Icons.bug_report,
+                //     onClicked: () async {
+                //       Navigator.of(context).pop();
+                //       var mailUrl = AppInfo.getBugReportUrl();
+                //       try {
+                //         await launch(mailUrl);
+                //       } catch (e) {}
+                //     }),
+                // const SizedBox(height: 5),
+                // Divider(
+                //   color: Colors.white70,
+                // ),
                 const SizedBox(height: 5),
                 buildMenuItem(
-                    text: 'Help and Feedback',
-                    icon: Icons.feedback,
-                    onClicked: () async {
-                      Navigator.of(context).pop();
-                      var mailUrl = AppInfo.getMailToForFeedback();
-                      try {
-                        await launch(mailUrl);
-                      } catch (e) {}
-                    }),
-                const SizedBox(height: 10),
-                buildMenuItem(
-                    text: 'Source Code',
-                    icon: Icons.folder,
-                    onClicked: () async {
-                      var sourceCodeUrl = AppInfo.getSourceCodeUrl();
-                      try {
-                        await launch(sourceCodeUrl);
-                      } catch (e) {}
-                    }),
-                const SizedBox(height: 10),
-                buildMenuItem(
-                    text: 'Report Bug',
-                    icon: Icons.bug_report,
-                    onClicked: () async {
-                      Navigator.of(context).pop();
-                      var mailUrl = AppInfo.getBugReportUrl();
-                      try {
-                        await launch(mailUrl);
-                      } catch (e) {}
-                    }),
-                const SizedBox(height: 5),
-                Divider(
-                  color: Colors.white70,
-                ),
-                const SizedBox(height: 5),
-                buildMenuItem(
-                    text: 'LogOut',
+                    text: 'Lock',
                     icon: Icons.logout_sharp,
                     onClicked: () async {
                       Navigator.of(context).pop();

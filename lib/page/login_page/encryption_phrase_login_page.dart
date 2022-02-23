@@ -15,7 +15,6 @@ class EncryptionPhraseLoginPage extends StatefulWidget {
 class _EncryptionPhraseLoginPageState extends State<EncryptionPhraseLoginPage> {
   final formKey = GlobalKey<FormState>();
   bool isHidden = true;
-
   final passPhraseController = TextEditingController();
   _EncryptionPhraseLoginPageState();
 
@@ -50,9 +49,10 @@ class _EncryptionPhraseLoginPageState extends State<EncryptionPhraseLoginPage> {
               key: formKey,
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(16),
-                child: UnDecryptedLoginControl.getAllowLogUnDecrypted()
-                    ? columnAllowNonDecrypt()
-                    : columnDefault(),
+                // child: UnDecryptedLoginControl.getAllowLogUnDecrypted()
+                //     ? columnAllowNonDecrypt()
+                //     : columnDefault(),
+                child: columnDefault(),
               ),
             ),
           ],

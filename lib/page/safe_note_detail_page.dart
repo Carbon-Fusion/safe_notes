@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
+
+import 'package:share_plus/share_plus.dart';
 
 import 'package:safe_notes/databaseAndStorage/safe_notes_database.dart';
 import 'package:safe_notes/model/safe_note.dart';
@@ -42,7 +45,7 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
         appBar: AppBar(
           actions: UnDecryptedLoginControl.getNoDecryptionFlag()
               ? null
-              : [editButton(), deleteButton()],
+              : [editButton(), deleteButton(), copyButton(),shareButton()],
         ),
         body: isLoading
             ? Center(child: CircularProgressIndicator())
@@ -73,7 +76,23 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
                 ),
               ),
       );
-
+  Widget shareButton() => IconButton(
+      icon: Icon(Icons.share),
+      onPressed: () async {
+        if (isLoading) return;
+        Share.share(note.title + "\n" + note.description , subject: note.title);
+      });
+  Widget copyButton() => IconButton(
+      icon: Icon(Icons.content_copy),
+      onPressed: () async {
+        if (isLoading) return;
+        Clipboard.setData(
+                new ClipboardData(text: note.title + "\n" + note.description))
+            .then((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Copied to your clipboard !')));
+        });
+      });
   Widget editButton() => IconButton(
       icon: Icon(Icons.edit_outlined),
       onPressed: () async {
@@ -86,12 +105,50 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
         refreshNote();
       });
 
+  showAlertDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget continueButton = TextButton(
+      child: Text("Continue"),
+      onPressed: ()  {
+        continueCallBack();
+        Navigator.of(context).pop();
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Confirm Deletion"),
+      content: Text("Would you really like to delete the note?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   Widget deleteButton() => IconButton(
         icon: Icon(Icons.delete),
         onPressed: () async {
-          await NotesDatabase.instance.delete(widget.noteId);
-
-          Navigator.of(context).pop();
+          showAlertDialog(context);
         },
       );
+
+  void continueCallBack() async {
+    await NotesDatabase.instance.delete(widget.noteId);
+    Navigator.of(context).pop();
+  }
 }
