@@ -131,14 +131,18 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
       },
     );
     // set up the AlertDialog
+    List<Widget> detailBar = [
+      cancelButton,
+      continueButton,
+      archiveButton,
+    ];
+    if(note.isArchive == "true"){
+      detailBar.removeLast();
+    }
     AlertDialog alert = AlertDialog(
       title: Text("Confirm Deletion"),
       content: Text("Would you really like to delete the note?"),
-      actions: [
-        cancelButton,
-        continueButton,
-        archiveButton,
-      ],
+      actions: detailBar,
     );
 
     // show the dialog
