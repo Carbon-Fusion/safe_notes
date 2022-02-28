@@ -132,7 +132,11 @@ class _EncryptionPhraseLoginPageState extends State<EncryptionPhraseLoginPage> {
         UnDecryptedLoginControl.setNoDecryptionFlag(false);
 
         await Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => NotesPage()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => NotesPage(
+                      viewArchive: false,
+                    )));
       } else {
         ScaffoldMessenger.of(context)
           ..removeCurrentSnackBar()
@@ -147,8 +151,10 @@ class _EncryptionPhraseLoginPageState extends State<EncryptionPhraseLoginPage> {
         text: AppInfo.getUndecryptedLoginButtonText(),
         onClicked: () async {
           UnDecryptedLoginControl.setNoDecryptionFlag(true);
-          await Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => NotesPage()));
+          await Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => NotesPage(
+                    viewArchive: false,
+                  )));
         },
       );
 

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class NoteFormWidget extends StatelessWidget {
   final String? title;
   final String? description;
-
+  final String? isArchive;
   final ValueChanged<String> onChangedTitle;
   final ValueChanged<String> onChangedDescription;
 
@@ -11,6 +11,7 @@ class NoteFormWidget extends StatelessWidget {
     Key? key,
     this.title = '',
     this.description = '',
+    this.isArchive = '',
     required this.onChangedTitle,
     required this.onChangedDescription,
   }) : super(key: key);

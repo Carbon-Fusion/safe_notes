@@ -25,14 +25,21 @@ import 'package:safe_notes/databaseAndStorage/safe_notes_database.dart';
 import 'package:safe_notes/databaseAndStorage/preference_storage_and_state_controls.dart';
 
 class NotesPage extends StatefulWidget {
+  final bool viewArchive;
+  const NotesPage({
+    Key? key,
+    required this.viewArchive,
+  }) : super(key: key);
   @override
   _NotesPageState createState() => _NotesPageState();
 }
 
 class _NotesPageState extends State<NotesPage> {
-  late List<SafeNote> notes;
-  late List<SafeNote> allnotes;
+  List<SafeNote> notes = [];
+  List<SafeNote> allnotes = [];
   bool isLoading = false;
+  bool _unarchive_visible = false;
+  bool _archive_visible = true;
   String query = '';
   bool isHiddenImport = true;
   final importPassphraseController = TextEditingController();
@@ -57,8 +64,26 @@ class _NotesPageState extends State<NotesPage> {
   Future refreshNotes() async {
     setState(() => isLoading = true);
     // storing copy of notes in allnotes so that it does not change while doing search
+    await widget.viewArchive ? archiveNotesLoad() : unArchiveNotesLoad();
+
+  }
+
+  Future unArchiveNotesLoad() async {
+    // storing copy of notes in allnotes so that it does not change while doing search
+    setState(() => _unarchive_visible = false);
+    setState(() => _archive_visible = true);
     this.allnotes =
-        this.notes = await NotesDatabase.instance.decryptReadAllNotes();
+        this.notes = await NotesDatabase.instance.decryptReadUnArchivedNotes();
+
+    setState(() => isLoading = false);
+  }
+
+  Future archiveNotesLoad() async {
+    // storing copy of notes in allnotes so that it does not change while doing search
+    setState(() => _unarchive_visible = true);
+    setState(() => _archive_visible = false);
+    this.allnotes =
+        this.notes = await NotesDatabase.instance.decryptReadArchivedNotes();
 
     setState(() => isLoading = false);
   }
@@ -69,7 +94,7 @@ class _NotesPageState extends State<NotesPage> {
           child: Scaffold(
         drawer: UnDecryptedLoginControl.getNoDecryptionFlag()
             ? null
-            : navigatioDrawerWidget(context),
+            : navigatiorDrawerWidget(context),
         appBar: AppBar(
           title: Text(
             AppInfo.getAppName(),
@@ -126,7 +151,7 @@ class _NotesPageState extends State<NotesPage> {
         onChanged: searchNote,
       );
 
-  Widget navigatioDrawerWidget(BuildContext context) {
+  Widget navigatiorDrawerWidget(BuildContext context) {
     final padding = EdgeInsets.symmetric(horizontal: 20);
     final visualName = AppInfo.getAppName();
     final imgPath = AppInfo.getLogoAsProfile();
@@ -196,7 +221,27 @@ class _NotesPageState extends State<NotesPage> {
                   icon: Icons.format_paint,
                   toggle: TheamToggle(),
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 10),
+                Visibility(
+                    visible: _archive_visible,
+                    child: buildMenuItem(
+                    text: 'Archived',
+                    icon: Icons.archive_rounded,
+                    onClicked: () async {
+                      await Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) => NotesPage(viewArchive: true,)));
+                    }),),
+                const SizedBox(height: 10),
+                Visibility(
+                  visible: _unarchive_visible,
+                  child: buildMenuItem(
+                      text: 'UnArchived',
+                      icon: Icons.unarchive_rounded,
+                      onClicked: () async {
+                        await Navigator.of(context)
+                            .push(MaterialPageRoute(builder: (context) => NotesPage(viewArchive: false,)));
+                      }),),
+                // const SizedBox(height: 5),
                 // Divider(
                 //   color: Colors.white70,
                 // ),

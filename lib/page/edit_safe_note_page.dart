@@ -19,12 +19,13 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
 
   late String title;
   late String description;
-
+  late String isArchive;
   @override
   void initState() {
     super.initState();
     title = widget.note?.title ?? '';
     description = widget.note?.description ?? '';
+    isArchive = widget.note?.isArchive ?? "false";
   }
 
   @override
@@ -38,6 +39,7 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
           key: _formKey,
           child: NoteFormWidget(
             title: title,
+            isArchive : isArchive,
             description: description,
             onChangedTitle: (title) => setState(() => this.title = title),
             onChangedDescription: (description) =>
@@ -82,16 +84,17 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
     final note = widget.note!.copy(
       title: title,
       description: description,
+      isArchive : isArchive,
     );
 
     await NotesDatabase.instance.encryptAndUpdate(note);
   }
-
   Future addNote() async {
     final note = SafeNote(
       title: title,
       description: description,
       createdTime: DateTime.now(),
+      isArchive: isArchive,
     );
 
     await NotesDatabase.instance.encryptAndStore(note);

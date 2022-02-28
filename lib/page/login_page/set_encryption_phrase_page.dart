@@ -141,7 +141,7 @@ class _SetEncryptionPhrasePageState extends State<SetEncryptionPhrasePage> {
         UnDecryptedLoginControl.setNoDecryptionFlag(false);
 
         await Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => NotesPage()));
+            context, MaterialPageRoute(builder: (context) => NotesPage(viewArchive: false,)));
       } else {
         ScaffoldMessenger.of(context)
           ..removeCurrentSnackBar()

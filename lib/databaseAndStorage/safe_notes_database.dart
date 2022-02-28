@@ -26,13 +26,15 @@ class NotesDatabase {
   Future _createDB(Database db, int version) async {
     final idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
     final textType = 'TEXT NOT NULL';
+    final intType = 'INTEGER';
 
     await db.execute('''
   CREATE TABLE $tableNotes ( 
   ${NoteFields.id} $idType, 
   ${NoteFields.title} $textType,
   ${NoteFields.description} $textType,
-  ${NoteFields.time} $textType
+  ${NoteFields.time} $textType,
+  ${NoteFields.isArchive} $textType
   )
   ''');
   }
@@ -66,9 +68,24 @@ class NotesDatabase {
     final orderBy = '${NoteFields.time} ASC';
     final result = await db.query(tableNotes, orderBy: orderBy);
 
-    return result.map((json) => SafeNote.fromJsonAndDecrypt(json)).toList();
+    return await result.map((json) => SafeNote.fromJsonAndDecrypt(json)).toList();
   }
+  Future<List<SafeNote>> decryptReadUnArchivedNotes() async {
+    final db = await instance.database;
 
+    final orderBy = '${NoteFields.time} ASC';
+    final result = await db.query(tableNotes, orderBy: orderBy);
+
+    return result.map((json) => SafeNote.fromJsonAndDecrypt(json)).where((element) => element.isArchive != "true").toList();
+  }
+  Future<List<SafeNote>> decryptReadArchivedNotes() async {
+    final db = await instance.database;
+
+    final orderBy = '${NoteFields.time} ASC';
+    final result = await db.query(tableNotes, orderBy: orderBy);
+
+    return result.map((json) => SafeNote.fromJsonAndDecrypt(json)).where((element) => element.isArchive == "true").toList();
+  }
   Future<int> encryptAndUpdate(SafeNote note) async {
     final db = await instance.database;
 

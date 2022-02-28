@@ -11,7 +11,6 @@ import 'package:safe_notes/databaseAndStorage/preference_storage_and_state_contr
 
 class NoteDetailPage extends StatefulWidget {
   final int noteId;
-
   const NoteDetailPage({
     Key? key,
     required this.noteId,
@@ -45,7 +44,7 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
         appBar: AppBar(
           actions: UnDecryptedLoginControl.getNoDecryptionFlag()
               ? null
-              : [editButton(), deleteButton(), copyButton(),shareButton()],
+              : [editButton(), deleteButton(), copyButton(), shareButton()],
         ),
         body: isLoading
             ? Center(child: CircularProgressIndicator())
@@ -68,6 +67,10 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
                       //style: TextStyle(color: Colors.white38),
                     ),
                     SizedBox(height: 8),
+                    Text(
+                      note.isArchive.toString(),
+                    ),
+                    SizedBox(height: 8),
                     SelectableText(
                       note.description,
                       style: TextStyle(/*color: Colors.white70,*/ fontSize: 18),
@@ -80,7 +83,7 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
       icon: Icon(Icons.share),
       onPressed: () async {
         if (isLoading) return;
-        Share.share(note.title + "\n" + note.description , subject: note.title);
+        Share.share(note.title + "\n" + note.description, subject: note.title);
       });
   Widget copyButton() => IconButton(
       icon: Icon(Icons.content_copy),
@@ -115,12 +118,18 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
     );
     Widget continueButton = TextButton(
       child: Text("Continue"),
-      onPressed: ()  {
-        continueCallBack();
+      onPressed: () {
+        continueDeleteCallBack();
         Navigator.of(context).pop();
       },
     );
-
+    Widget archiveButton = TextButton(
+      child: Text("Move to Archive"),
+      onPressed: () async {
+        await updateArchiveStatus();
+        Navigator.of(context).pop();
+      },
+    );
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: Text("Confirm Deletion"),
@@ -128,6 +137,7 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
       actions: [
         cancelButton,
         continueButton,
+        archiveButton,
       ],
     );
 
@@ -137,6 +147,7 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
       builder: (BuildContext context) {
         return alert;
       },
+      useRootNavigator: false,
     );
   }
 
@@ -147,8 +158,21 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
         },
       );
 
-  void continueCallBack() async {
+  void continueDeleteCallBack() async {
     await NotesDatabase.instance.delete(widget.noteId);
+    Navigator.of(context).pop();
+  }
+
+  Future updateArchiveStatus() async {
+    final noteForArchive =
+        await NotesDatabase.instance.decryptReadNote(widget.noteId);
+    final note = noteForArchive.copy(
+      title: noteForArchive.title,
+      description: noteForArchive.description,
+      isArchive: "true",
+    );
+
+    await NotesDatabase.instance.encryptAndUpdate(note);
     Navigator.of(context).pop();
   }
 }
