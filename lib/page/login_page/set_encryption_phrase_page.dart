@@ -17,7 +17,7 @@ class _SetEncryptionPhrasePageState extends State<SetEncryptionPhrasePage> {
   final formKey = GlobalKey<FormState>();
   final passPhraseController = TextEditingController();
   final passPhraseControllerConfirm = TextEditingController();
-  bool isHidden = false;
+  bool isHidden = true;
 
   @override
   void dispose() {
