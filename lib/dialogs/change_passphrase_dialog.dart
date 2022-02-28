@@ -22,7 +22,8 @@ class ChangePassphraseDialog extends StatefulWidget {
 class _ChangePassphraseDialogState extends State<ChangePassphraseDialog> {
   final formKey = GlobalKey<FormState>();
   bool isHiddenOld = true;
-  bool isHiddenNewConfirm = false;
+  bool isHiddenNewConfirm = true;
+  bool isHiddenNew = true;
   final oldPassphraseController = TextEditingController();
   final newPassphraseController = TextEditingController();
   final newConfirmPassphraseController = TextEditingController();
@@ -104,13 +105,19 @@ class _ChangePassphraseDialogState extends State<ChangePassphraseDialog> {
         controller: newPassphraseController,
         autofocus: true,
         enableInteractiveSelection: false,
-        obscureText: true,
+        obscureText: isHiddenNew,
         decoration: InputDecoration(
           hintText: 'New Passphrase',
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
           ),
           prefixIcon: Icon(Icons.lock),
+          suffixIcon: IconButton(
+            icon : (isHiddenNew
+                ? Icon(Icons.visibility_off)
+                : Icon(Icons.visibility)),
+            onPressed: toggleNewPasswordVisibility,
+          ),
         ),
         keyboardType: TextInputType.visiblePassword,
         onEditingComplete: () => node.nextFocus(),
@@ -146,6 +153,8 @@ class _ChangePassphraseDialogState extends State<ChangePassphraseDialog> {
       setState(() => isHiddenOld = !isHiddenOld);
   void toggleNewConfirmPasswordVisibility() =>
       setState(() => isHiddenNewConfirm = !isHiddenNewConfirm);
+  void toggleNewPasswordVisibility() =>
+      setState(() => isHiddenNew = !isHiddenNew);
 
   finalSublmitChange() async {
     final form = formKey.currentState!;
