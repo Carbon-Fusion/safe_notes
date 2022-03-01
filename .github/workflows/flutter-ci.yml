@@ -24,7 +24,12 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: gradle
-    
+    - name: Android NDK toolchain Setup
+      uses: ravinderjangra/android-ndk-toolchain-setup@0.1
+      with:
+        api: '21'
+        arch: 'arm'
+        install-location: 'toolchains'
     # Setup the flutter environment.
     - uses: subosito/flutter-action@v2
       with:
