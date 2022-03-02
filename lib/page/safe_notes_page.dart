@@ -676,9 +676,14 @@ class _NotesPageState extends State<NotesPage> {
           return GestureDetector(
             onTap: () async {
               await Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => AddEditNotePage(note: note),
+              ));
+              refreshNotes();
+            },
+            onLongPress: () async{
+              await Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => NoteDetailPage(noteId: note.id!),
               ));
-
               refreshNotes();
             },
             child: NoteCardWidget(note: note, index: index),
