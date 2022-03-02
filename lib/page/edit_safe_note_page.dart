@@ -7,10 +7,11 @@ import 'package:safe_notes/widget/safe_note_form_widget.dart';
 
 class AddEditNotePage extends StatefulWidget {
   final SafeNote? note;
-
-  const AddEditNotePage({
+  late String saveInArchive;
+  AddEditNotePage({
     Key? key,
     this.note,
+    this.saveInArchive = "false",
   }) : super(key: key);
   @override
   _AddEditNotePageState createState() => _AddEditNotePageState();
@@ -29,7 +30,7 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
     title = widget.note?.title ?? '';
     title = emptyTitle(title);
     description = widget.note?.description ?? '';
-    isArchive = widget.note?.isArchive ?? "false";
+    isArchive = widget.note?.isArchive ?? widget.saveInArchive;
   }
 
   @override

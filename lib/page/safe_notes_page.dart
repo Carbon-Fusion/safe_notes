@@ -138,13 +138,15 @@ class _NotesPageState extends State<NotesPage> {
                 child: Icon(Icons.add),
                 onPressed: () async {
                   await Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => AddEditNotePage()),
+                    MaterialPageRoute(builder: (context) => AddEditNotePage(saveInArchive: boolToString(widget.viewArchive),)),
                   );
                   refreshNotes();
                 },
               ),
       ));
-
+  String boolToString(bool to_conv){
+    return to_conv ? "true" : "false";
+  }
   Widget buildSearch() => SearchWidget(
         text: query,
         hintText: 'Title or Content',
