@@ -66,10 +66,10 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
                       DateFormat.yMMMd().format(note.createdTime),
                       //style: TextStyle(color: Colors.white38),
                     ),
-                    SizedBox(height: 8),
-                    Text(
-                      note.isArchive.toString(),
-                    ),
+                    // SizedBox(height: 8),
+                    // Text(
+                    //   note.isArchive.toString(),
+                    // ),
                     SizedBox(height: 8),
                     SelectableText(
                       note.description,
