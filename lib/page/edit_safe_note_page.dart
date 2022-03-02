@@ -71,6 +71,7 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
 
         if(usableCheck()){
           addOrUpdateNote();
+          Navigator.of(context).pop();
         }
       },
       icon: Icon(Icons.save_rounded),
@@ -129,8 +130,6 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
       } else {
         await addNote();
       }
-
-      Navigator.of(context).pop();
     }
   }
 
