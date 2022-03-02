@@ -38,7 +38,7 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         appBar: AppBar(
-          actions: [copyButton(),shareButton(),buildButton()],
+          actions: [deleteButton(),copyButton(),shareButton(),buildButton()],
         ),
         body: Form(
           key: _formKey,
@@ -159,4 +159,82 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
 
     await NotesDatabase.instance.encryptAndStore(note);
   }
+
+  //TODO(FIX THIS SHIT)
+  showAlertDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget continueButton = TextButton(
+      child: Text("Continue"),
+      onPressed: () {
+        continueDeleteCallBack();
+        Navigator.of(context).pop();
+      },
+    );
+    Widget archiveButton = TextButton(
+      child: Text("Move to Archive"),
+      onPressed: () async {
+        await updateArchiveStatus();
+        Navigator.of(context).pop();
+      },
+    );
+    // set up the AlertDialog
+    List<Widget> detailBar = [
+      cancelButton,
+      continueButton,
+      archiveButton,
+    ];
+    if(widget.note!.isArchive == "true"){
+      detailBar.removeLast();
+    }
+    AlertDialog alert = AlertDialog(
+      title: Text("Confirm Deletion"),
+      content: Text("Would you really like to delete the note?"),
+      actions: detailBar,
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+      useRootNavigator: false,
+    );
+  }
+
+  Widget deleteButton() => IconButton(
+    icon: Icon(Icons.delete),
+    onPressed: () async {
+      if(widget.note == null){
+        Navigator.of(context).pop();
+        return;
+      }
+      showAlertDialog(context);
+    },
+  );
+
+  void continueDeleteCallBack() async {
+    await NotesDatabase.instance.delete(widget.note!.id!);
+    Navigator.of(context).pop();
+  }
+
+  Future updateArchiveStatus() async {
+    final noteForArchive =
+    await NotesDatabase.instance.decryptReadNote(widget.note!.id!);
+    final note = noteForArchive.copy(
+      title: noteForArchive.title,
+      description: noteForArchive.description,
+      isArchive: "true",
+    );
+
+    await NotesDatabase.instance.encryptAndUpdate(note);
+    Navigator.of(context).pop();
+  }
 }
+
