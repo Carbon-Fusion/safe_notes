@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:crypto/crypto.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -148,19 +149,32 @@ class _NotesPageState extends State<NotesPage> {
       );
   Widget selectedDeleteButton() => IconButton(
         icon: Icon(Icons.delete),
-        onPressed: () async {
+        onPressed: () {
           showAlertDialog(context);
-          setState(() {
-            _changeSelection(false, -1);
-          });
-          refreshNotes();
         },
       );
-
+  Widget selectedCopyButton() => IconButton(
+        icon: Icon(Icons.content_copy),
+        onPressed: () async {
+          if (_selectedNotesIndexList.length <= 1) {
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Can Select only single note to Copy")));
+            return;
+          }
+          Clipboard.setData(new ClipboardData(
+                  text: notes[_selectedNotesIndexList.first].title +
+                      "\n" +
+                      notes[_selectedNotesIndexList.first].description))
+              .then((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Copied to your clipboard !')));
+          });
+        },
+      );
   Widget selectedShareButton() => IconButton(
         icon: Icon(Icons.share),
         onPressed: () async {
-          if (_selectedNotesIndexList.length != 1) {
+          if (_selectedNotesIndexList.length <= 1) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text("Can Select only single note to share")));
           } else {
@@ -196,6 +210,7 @@ class _NotesPageState extends State<NotesPage> {
             ? [
                 selectedDeleteButton(),
                 selectedShareButton(),
+                selectedCopyButton(),
                 selectedArchiveButton()
               ]
             : [selectedDeleteButton(), selectedArchiveButton()],
@@ -492,10 +507,17 @@ class _NotesPageState extends State<NotesPage> {
   }
 
   void continueDeleteCallBack() async {
+    setState(() {
+      isLoading = true;
+    });
     for (var selectedIndex in _selectedNotesIndexList) {
       await NotesDatabase.instance.delete(notes[selectedIndex].id!);
     }
-    Navigator.of(context).pop();
+    setState(() {
+      isLoading = false;
+      _changeSelection(false, -1);
+      refreshNotes();
+    });
   }
 
   Future updateArchiveStatus() async {
