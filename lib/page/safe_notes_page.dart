@@ -156,7 +156,7 @@ class _NotesPageState extends State<NotesPage> {
   Widget selectedCopyButton() => IconButton(
         icon: Icon(Icons.content_copy),
         onPressed: () async {
-          if (_selectedNotesIndexList.length <= 1) {
+          if (_selectedNotesIndexList.length != 1) {
             ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text("Can Select only single note to Copy")));
             return;
@@ -174,7 +174,7 @@ class _NotesPageState extends State<NotesPage> {
   Widget selectedShareButton() => IconButton(
         icon: Icon(Icons.share),
         onPressed: () async {
-          if (_selectedNotesIndexList.length <= 1) {
+          if (_selectedNotesIndexList.length != 1) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text("Can Select only single note to share")));
           } else {
