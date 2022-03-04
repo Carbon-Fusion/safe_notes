@@ -1,28 +1,26 @@
-import 'dart:ui';
-import 'dart:io';
 import 'dart:convert';
-import 'package:crypto/crypto.dart';
-import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'dart:io';
+import 'dart:ui';
 
+import 'package:crypto/crypto.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-
-import 'package:safe_notes/main.dart';
-import 'package:safe_notes/model/safe_note.dart';
-import 'package:safe_notes/widget/search_widget.dart';
-import 'package:safe_notes/model/import_file_parser.dart';
-import 'package:safe_notes/page/edit_safe_note_page.dart';
-import 'package:safe_notes/widget/theme_toggle_widget.dart';
-import 'package:safe_notes/page/safe_note_detail_page.dart';
-import 'package:safe_notes/widget/safe_note_card_widget.dart';
+import 'package:safe_notes/databaseAndStorage/preference_storage_and_state_controls.dart';
+import 'package:safe_notes/databaseAndStorage/safe_notes_database.dart';
 import 'package:safe_notes/dialogs/change_passphrase_dialog.dart';
 import 'package:safe_notes/dialogs/import_passphrase_dialog.dart';
 import 'package:safe_notes/dialogs/toggle_undecrypt_flag_dialog.dart';
-import 'package:safe_notes/databaseAndStorage/safe_notes_database.dart';
-import 'package:safe_notes/databaseAndStorage/preference_storage_and_state_controls.dart';
+import 'package:safe_notes/main.dart';
+import 'package:safe_notes/model/import_file_parser.dart';
+import 'package:safe_notes/model/safe_note.dart';
+import 'package:safe_notes/page/edit_safe_note_page.dart';
+import 'package:safe_notes/widget/safe_note_card_widget.dart';
+import 'package:safe_notes/widget/search_widget.dart';
+import 'package:safe_notes/widget/theme_toggle_widget.dart';
+import 'package:share_plus/share_plus.dart';
 
 class NotesPage extends StatefulWidget {
   final bool viewArchive;
@@ -44,7 +42,8 @@ class _NotesPageState extends State<NotesPage> {
   bool isHiddenImport = true;
   final importPassphraseController = TextEditingController();
   bool isLogout = false;
-
+  List<int> _selectedNotesIndexList = [];
+  bool _selectionMode = false;
   @override
   void initState() {
     super.initState();
@@ -65,7 +64,6 @@ class _NotesPageState extends State<NotesPage> {
     setState(() => isLoading = true);
     // storing copy of notes in allnotes so that it does not change while doing search
     await widget.viewArchive ? archiveNotesLoad() : unArchiveNotesLoad();
-
   }
 
   Future unArchiveNotesLoad() async {
@@ -95,15 +93,7 @@ class _NotesPageState extends State<NotesPage> {
         drawer: UnDecryptedLoginControl.getNoDecryptionFlag()
             ? null
             : navigatiorDrawerWidget(context),
-        appBar: AppBar(
-          title: Text(
-            AppInfo.getAppName(),
-            style: TextStyle(fontSize: 24),
-          ),
-          /*  actions: UnDecryptedLoginControl.getNoDecryptionFlag()
-              ? null
-              : [exportButton(), importButton()], */
-        ),
+        appBar: getAppbar(),
         body: Column(
           children: <Widget>[
             buildSearch(),
@@ -126,7 +116,7 @@ class _NotesPageState extends State<NotesPage> {
                           'No Notes',
                           style: TextStyle(color: Colors.white, fontSize: 24),
                         )
-                      : 
+                      :
               buildNotes(), */
             ),
           ],
@@ -138,20 +128,76 @@ class _NotesPageState extends State<NotesPage> {
                 child: Icon(Icons.add),
                 onPressed: () async {
                   await Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => AddEditNotePage(saveInArchive: boolToString(widget.viewArchive),)),
+                    MaterialPageRoute(
+                        builder: (context) => AddEditNotePage(
+                              saveInArchive: boolToString(widget.viewArchive),
+                            )),
                   );
                   refreshNotes();
                 },
               ),
       ));
-  String boolToString(bool to_conv){
+  String boolToString(bool to_conv) {
     return to_conv ? "true" : "false";
   }
+
   Widget buildSearch() => SearchWidget(
         text: query,
         hintText: 'Title or Content',
         onChanged: searchNote,
       );
+  Widget selectedDeleteButton() => IconButton(
+        icon: Icon(Icons.delete),
+        onPressed: () async {
+          showAlertDialog(context);
+        },
+      );
+
+  Widget selectedShareButton() => IconButton(
+        icon: Icon(Icons.share),
+        onPressed: () async {
+          if (_selectedNotesIndexList.length != 1) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("Can Select only single note to share")));
+          } else {
+            final selectedNote = notes[_selectedNotesIndexList.first];
+            Share.share(selectedNote.title + "\n" + selectedNote.description,
+                subject: selectedNote.title);
+          }
+        },
+      );
+  Widget selectedArchiveButton() => IconButton(
+        icon: widget.viewArchive
+            ? Icon(Icons.unarchive_rounded)
+            : Icon(Icons.archive_rounded),
+        onPressed: () async {
+          await updateArchiveStatus();
+        },
+      );
+  PreferredSizeWidget getAppbar() {
+    if (_selectionMode) {
+      return AppBar(
+        title: Text(
+          _selectedNotesIndexList.length.toString(),
+          style: TextStyle(fontSize: 24),
+        ),
+        actions: _selectedNotesIndexList.length == 1
+            ? [
+                selectedDeleteButton(),
+                selectedShareButton(),
+                selectedArchiveButton()
+              ]
+            : [selectedDeleteButton(), selectedArchiveButton()],
+      );
+    } else {
+      return AppBar(
+        title: Text(
+          AppInfo.appName,
+          style: TextStyle(fontSize: 24),
+        ),
+      );
+    }
+  }
 
   Widget navigatiorDrawerWidget(BuildContext context) {
     final padding = EdgeInsets.symmetric(horizontal: 20);
@@ -225,14 +271,17 @@ class _NotesPageState extends State<NotesPage> {
                 ),
                 const SizedBox(height: 10),
                 Visibility(
-                    visible: _archive_visible,
-                    child: buildMenuItem(
-                    text: 'Archived',
-                    icon: Icons.archive_rounded,
-                    onClicked: () async {
-                      await Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (context) => NotesPage(viewArchive: true,)));
-                    }),),
+                  visible: _archive_visible,
+                  child: buildMenuItem(
+                      text: 'Archived',
+                      icon: Icons.archive_rounded,
+                      onClicked: () async {
+                        await Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => NotesPage(
+                                  viewArchive: true,
+                                )));
+                      }),
+                ),
                 const SizedBox(height: 10),
                 Visibility(
                   visible: _unarchive_visible,
@@ -240,9 +289,12 @@ class _NotesPageState extends State<NotesPage> {
                       text: 'UnArchived',
                       icon: Icons.unarchive_rounded,
                       onClicked: () async {
-                        await Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (context) => NotesPage(viewArchive: false,)));
-                      }),),
+                        await Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => NotesPage(
+                                  viewArchive: false,
+                                )));
+                      }),
+                ),
                 // const SizedBox(height: 5),
                 // Divider(
                 //   color: Colors.white70,
@@ -376,8 +428,6 @@ class _NotesPageState extends State<NotesPage> {
     );
   }
 
-//Begin:  Block for handling of data export
-
 /*   Widget exportButton() => IconButton(
       icon: Icon(Icons.file_upload_outlined),
       onPressed: () async {
@@ -392,6 +442,64 @@ class _NotesPageState extends State<NotesPage> {
         await fileSave();
         ExportEncryptionControl.setIsExportEncrypted(true);
       }); */
+  // Begin handling appbar changes
+  showAlertDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget continueButton = TextButton(
+      child: Text("Continue"),
+      onPressed: () {
+        continueDeleteCallBack();
+        Navigator.of(context).pop();
+      },
+    );
+    // set up the AlertDialog
+    List<Widget> detailBar = [
+      cancelButton,
+      continueButton,
+    ];
+
+    AlertDialog alert = AlertDialog(
+      title: Text("Confirm Deletion"),
+      content: Text("Would you really like to delete the note?"),
+      actions: detailBar,
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+      useRootNavigator: false,
+    );
+  }
+
+  void continueDeleteCallBack() async {
+    for (var selectedIndex in _selectedNotesIndexList) {
+      await NotesDatabase.instance.delete(notes[selectedIndex].id!);
+    }
+    Navigator.of(context).pop();
+  }
+
+  Future updateArchiveStatus() async {
+    for (var selectedIndex in _selectedNotesIndexList) {
+      final noteForArchive = await NotesDatabase.instance
+          .decryptReadNote(notes[selectedIndex].id!);
+      final note = noteForArchive.copy(
+        title: noteForArchive.title,
+        description: noteForArchive.description,
+        isArchive: boolToString(widget.viewArchive),
+      );
+      await NotesDatabase.instance.encryptAndUpdate(note);
+    }
+    Navigator.of(context).pop();
+  }
 
   showExportDialog(BuildContext context) async {
     return showDialog(
@@ -665,33 +773,78 @@ class _NotesPageState extends State<NotesPage> {
 //End:  Block for handling import of data
 
 //Begin: Handling the render of note cards
-  Widget buildNotes() => StaggeredGridView.countBuilder(
-        padding: EdgeInsets.all(8),
-        itemCount: notes.length,
-        staggeredTileBuilder: (index) => StaggeredTile.fit(2),
-        crossAxisCount: 4,
-        mainAxisSpacing: 4,
-        crossAxisSpacing: 4,
-        itemBuilder: (context, index) {
-          final note = notes[index];
 
-          return GestureDetector(
-            onTap: () async {
-              await Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => AddEditNotePage(note: note),
-              ));
-              refreshNotes();
-            },
-            onLongPress: () async{
-              await Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => NoteDetailPage(noteId: note.id!),
-              ));
-              refreshNotes();
-            },
-            child: NoteCardWidget(note: note, index: index),
-          );
-        },
+  void _changeSelection(bool enable, int index) {
+    _selectionMode = enable;
+    if (index == -1) {
+      _selectedNotesIndexList.clear();
+      return;
+    }
+    _selectedNotesIndexList.add(index);
+  }
+
+  Widget buildNotes() => StaggeredGridView.countBuilder(
+      padding: EdgeInsets.all(8),
+      itemCount: notes.length,
+      staggeredTileBuilder: (index) => StaggeredTile.fit(2),
+      crossAxisCount: 4,
+      mainAxisSpacing: 4,
+      crossAxisSpacing: 4,
+      itemBuilder: (context, index) {
+        return getGridTile(index);
+      });
+  GridTile getGridTile(int index) {
+    if (_selectionMode) {
+      return GridTile(
+        child: InkResponse(
+          highlightColor: Colors.black,
+          child: NoteCardWidget(
+            note: notes[index],
+            index: index,
+            isSelected: _selectedNotesIndexList.contains(index),
+            isInSelectionMode: _selectionMode,
+          ),
+          onLongPress: () {
+            setState(() {
+              _changeSelection(false, -1);
+            });
+          },
+          onTap: () {
+            setState(() {
+              if (_selectedNotesIndexList.contains(index)) {
+                _selectedNotesIndexList.remove(index);
+                if (_selectedNotesIndexList.isEmpty) _selectionMode = false;
+              } else {
+                _selectedNotesIndexList.add(index);
+              }
+            });
+          },
+        ),
       );
+    } else {
+      return GridTile(
+        child: InkResponse(
+          child: NoteCardWidget(
+            note: notes[index],
+            index: index,
+            isSelected: false,
+            isInSelectionMode: _selectionMode,
+          ),
+          onTap: () async {
+            await Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => AddEditNotePage(note: notes[index]),
+            ));
+            refreshNotes();
+          },
+          onLongPress: () {
+            setState(() {
+              _changeSelection(true, index);
+            });
+          },
+        ),
+      );
+    }
+  }
 
   void searchNote(String query) {
     // Searching the given query in title and description

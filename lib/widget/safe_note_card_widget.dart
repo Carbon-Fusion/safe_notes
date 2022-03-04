@@ -11,15 +11,20 @@ final _lightColors = [
   Colors.orange.shade400,
 ];
 
+final _selectedColor = Colors.black;
+
 class NoteCardWidget extends StatelessWidget {
+  final SafeNote note;
+  final bool isSelected;
+  final int index;
+  final bool isInSelectionMode;
   NoteCardWidget({
     Key? key,
     required this.note,
     required this.index,
+    required this.isSelected,
+    required this.isInSelectionMode,
   }) : super(key: key);
-
-  final SafeNote note;
-  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +42,15 @@ class NoteCardWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Visibility(
+              visible: isInSelectionMode,
+              child: Icon(
+                isSelected
+                    ? Icons.check_circle_outline
+                    : Icons.radio_button_unchecked,
+              ),
+            ),
+            SizedBox(height: 2),
             Text(
               note.title.length > 30
                   ? (note.title.substring(0, 30).replaceAll("\n", " ") + '...')
