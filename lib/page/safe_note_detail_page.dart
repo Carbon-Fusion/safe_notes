@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
-
-import 'package:share_plus/share_plus.dart';
-
+import 'package:intl/intl.dart';
+import 'package:safe_notes/databaseAndStorage/preference_storage_and_state_controls.dart';
 import 'package:safe_notes/databaseAndStorage/safe_notes_database.dart';
 import 'package:safe_notes/model/safe_note.dart';
 import 'package:safe_notes/page/edit_safe_note_page.dart';
-import 'package:safe_notes/databaseAndStorage/preference_storage_and_state_controls.dart';
+import 'package:share_plus/share_plus.dart';
 
 class NoteDetailPage extends StatefulWidget {
   final int noteId;
@@ -136,7 +134,7 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
       continueButton,
       archiveButton,
     ];
-    if(note.isArchive == "true"){
+    if (note.isArchive == "true") {
       detailBar.removeLast();
     }
     AlertDialog alert = AlertDialog(

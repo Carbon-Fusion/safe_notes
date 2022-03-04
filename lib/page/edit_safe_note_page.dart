@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:safe_notes/databaseAndStorage/safe_notes_database.dart';
 import 'package:safe_notes/model/safe_note.dart';
 import 'package:safe_notes/widget/safe_note_form_widget.dart';
+import 'package:share_plus/share_plus.dart';
 
 class AddEditNotePage extends StatefulWidget {
   final SafeNote? note;
@@ -38,7 +38,7 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         appBar: AppBar(
-          actions: [deleteButton(),copyButton(),shareButton(),buildButton()],
+          actions: [deleteButton(), copyButton(), shareButton(), buildButton()],
         ),
         body: Form(
           key: _formKey,
@@ -54,7 +54,6 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
       ));
 
   Widget buildButton() {
-
     // return Padding(
     //   padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
     //   child: ElevatedButton(
@@ -68,27 +67,25 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
     // );
     return IconButton(
       onPressed: () async {
-        if(usableCheck()){
+        if (usableCheck()) {
           Navigator.of(context).pop();
         }
       },
       icon: Icon(Icons.save_rounded),
     );
   }
+
   Widget shareButton() => IconButton(
       icon: Icon(Icons.share),
       onPressed: () async {
-        if(!usableCheck())
-            return;
+        if (!usableCheck()) return;
         Share.share(title + "\n" + description, subject: title);
       });
   Widget copyButton() => IconButton(
       icon: Icon(Icons.content_copy),
       onPressed: () async {
-        if(!usableCheck())
-            return;
-        Clipboard.setData(
-            new ClipboardData(text: title + "\n" + description))
+        if (!usableCheck()) return;
+        Clipboard.setData(new ClipboardData(text: title + "\n" + description))
             .then((_) {
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Copied to your clipboard !')));
@@ -97,15 +94,16 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
   bool isFormValid() {
     return description.isNotEmpty;
   }
-  void startFixTitle(){
-    if(title.isEmpty)
-        title = ZWSP;
+
+  void startFixTitle() {
+    if (title.isEmpty) title = ZWSP;
   }
-  void endFixTitle(){
-    if(title == ZWSP)
-        title = '';
+
+  void endFixTitle() {
+    if (title == ZWSP) title = '';
   }
-  bool usableCheck(){
+
+  bool usableCheck() {
     if (isFormValid()) {
       startFixTitle();
       addOrUpdateNote();
@@ -117,6 +115,7 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
       return false;
     }
   }
+
   void addOrUpdateNote() async {
     final isValid = _formKey.currentState!.validate();
 
@@ -140,12 +139,14 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
 
     await NotesDatabase.instance.encryptAndUpdate(note);
   }
-  String emptyTitle(String to_empty){
-    if(to_empty == "​")
+
+  String emptyTitle(String to_empty) {
+    if (to_empty == "​")
       return '';
     else
       return to_empty;
   }
+
   Future addNote() async {
     final note = SafeNote(
       title: title,
@@ -186,7 +187,7 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
       continueButton,
       archiveButton,
     ];
-    if(widget.note!.isArchive == "true"){
+    if (widget.note!.isArchive == "true") {
       detailBar.removeLast();
     }
     AlertDialog alert = AlertDialog(
@@ -206,15 +207,15 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
   }
 
   Widget deleteButton() => IconButton(
-    icon: Icon(Icons.delete),
-    onPressed: () async {
-      if(widget.note == null){
-        Navigator.of(context).pop();
-        return;
-      }
-      showAlertDialog(context);
-    },
-  );
+        icon: Icon(Icons.delete),
+        onPressed: () async {
+          if (widget.note == null) {
+            Navigator.of(context).pop();
+            return;
+          }
+          showAlertDialog(context);
+        },
+      );
 
   void continueDeleteCallBack() async {
     await NotesDatabase.instance.delete(widget.note!.id!);
@@ -223,7 +224,7 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
 
   Future updateArchiveStatus() async {
     final noteForArchive =
-    await NotesDatabase.instance.decryptReadNote(widget.note!.id!);
+        await NotesDatabase.instance.decryptReadNote(widget.note!.id!);
     final note = noteForArchive.copy(
       title: noteForArchive.title,
       description: noteForArchive.description,
@@ -234,4 +235,3 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
     Navigator.of(context).pop();
   }
 }
-
