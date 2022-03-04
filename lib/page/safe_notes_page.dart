@@ -150,6 +150,10 @@ class _NotesPageState extends State<NotesPage> {
         icon: Icon(Icons.delete),
         onPressed: () async {
           showAlertDialog(context);
+          setState(() {
+            _changeSelection(false, -1);
+          });
+          refreshNotes();
         },
       );
 
@@ -164,6 +168,9 @@ class _NotesPageState extends State<NotesPage> {
             Share.share(selectedNote.title + "\n" + selectedNote.description,
                 subject: selectedNote.title);
           }
+          setState(() {
+            _changeSelection(false, -1);
+          });
         },
       );
   Widget selectedArchiveButton() => IconButton(
@@ -172,6 +179,10 @@ class _NotesPageState extends State<NotesPage> {
             : Icon(Icons.archive_rounded),
         onPressed: () async {
           await updateArchiveStatus();
+          setState(() {
+            _changeSelection(false, -1);
+          });
+          refreshNotes();
         },
       );
   PreferredSizeWidget getAppbar() {
@@ -494,11 +505,10 @@ class _NotesPageState extends State<NotesPage> {
       final note = noteForArchive.copy(
         title: noteForArchive.title,
         description: noteForArchive.description,
-        isArchive: boolToString(widget.viewArchive),
+        isArchive: boolToString(!widget.viewArchive),
       );
       await NotesDatabase.instance.encryptAndUpdate(note);
     }
-    Navigator.of(context).pop();
   }
 
   showExportDialog(BuildContext context) async {
