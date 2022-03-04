@@ -68,9 +68,7 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
     // );
     return IconButton(
       onPressed: () async {
-
         if(usableCheck()){
-          addOrUpdateNote();
           Navigator.of(context).pop();
         }
       },
