@@ -68,8 +68,8 @@ class ImportPassPhraseHandler {
 }
 
 class AppInfo {
-  static String appName = 'Safe Notes';
-  static String appSlogan = 'Heaven for your data!';
+  static String appName = 'Notes';
+  static String appSlogan = '';
   static String firstLoginPageName = 'Set Encryption Phrase';
   static String loginPageName = 'Vault Login';
   static String undecryptedLoginButtonText = 'Nah! Show Un-Decrypted';

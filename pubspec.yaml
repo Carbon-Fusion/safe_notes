@@ -60,19 +60,17 @@ dev_dependencies:
 
 dependency_overrides:
   args: 2.1.1
-  
+
 flutter_native_splash:
-  color: "##bababa"
+  color: "##3C3F41"
   image: "assets/splash_500.png"
-  color_dark: "#1d5766"
-  image_dark: "assets/splash_500_dark.png"
-  android: true
+  android: false
   ios: true
   
 flutter_icons:
   android: true
   ios: false
-  image_path: "assets/icon.png"
+  image_path: "assets/icon_shadown_sqr.png"
 
   
 

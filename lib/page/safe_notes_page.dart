@@ -235,7 +235,7 @@ class _NotesPageState extends State<NotesPage> {
             topRight: Radius.circular(20), bottomRight: Radius.circular(20)),
         child: Drawer(
           child: Material(
-            color: Color.fromRGBO(0, 290, 55, 50),
+            color: Colors.blueGrey.shade900,
             child: ListView(
               padding: padding,
               children: <Widget>[
@@ -243,7 +243,6 @@ class _NotesPageState extends State<NotesPage> {
                 buildNavigationHeader(
                   imgPath: imgPath,
                   name: visualName,
-                  msg: slogan,
                 ),
                 /* Divider(
               color: Colors.white70,
@@ -396,7 +395,6 @@ class _NotesPageState extends State<NotesPage> {
   Widget buildNavigationHeader({
     required String imgPath,
     required String name,
-    required String msg,
     //VoidCallback? onClicked,
   }) =>
       InkWell(
@@ -420,11 +418,6 @@ class _NotesPageState extends State<NotesPage> {
                   Text(
                     name,
                     style: TextStyle(fontSize: 25, color: Colors.white),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    msg,
-                    style: TextStyle(fontSize: 17, color: Colors.white),
                   ),
                 ],
               )
