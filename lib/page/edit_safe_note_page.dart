@@ -17,7 +17,8 @@ class AddEditNotePage extends StatefulWidget {
   _AddEditNotePageState createState() => _AddEditNotePageState();
 }
 
-class _AddEditNotePageState extends State<AddEditNotePage> with WidgetsBindingObserver{
+class _AddEditNotePageState extends State<AddEditNotePage>
+    with WidgetsBindingObserver {
   final _formKey = GlobalKey<FormState>();
   bool savedOnce = false;
   late String title;
@@ -26,8 +27,8 @@ class _AddEditNotePageState extends State<AddEditNotePage> with WidgetsBindingOb
   final String ZWSP = '​';
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state){
-    switch(state){
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
       case AppLifecycleState.resumed:
         break;
       case AppLifecycleState.inactive:
@@ -49,36 +50,41 @@ class _AddEditNotePageState extends State<AddEditNotePage> with WidgetsBindingOb
   }
 
   @override
-  void dispose(){
+  void dispose() {
     WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) => WillPopScope(
-    onWillPop: () async {
-      usableCheck();
-      return true;
-    },
-    child: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Scaffold(
-          appBar: AppBar(
-            actions: [deleteButton(), copyButton(), shareButton(), buildButton()],
-          ),
-          body: Form(
-            key: _formKey,
-            child: NoteFormWidget(
-              title: title,
-              isArchive: isArchive,
-              description: description,
-              onChangedTitle: (title) => setState(() => this.title = title),
-              onChangedDescription: (description) =>
-                  setState(() => this.description = description),
-            ),
-          ),
-        )),
-  );
+        onWillPop: () async {
+          usableCheck();
+          return true;
+        },
+        child: GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: Scaffold(
+              appBar: AppBar(
+                actions: [
+                  shareButton(),
+                  buildButton(),
+                  copyButton(),
+                  deleteButton(),
+                ],
+              ),
+              body: Form(
+                key: _formKey,
+                child: NoteFormWidget(
+                  title: title,
+                  isArchive: isArchive,
+                  description: description,
+                  onChangedTitle: (title) => setState(() => this.title = title),
+                  onChangedDescription: (description) =>
+                      setState(() => this.description = description),
+                ),
+              ),
+            )),
+      );
 
   Widget buildButton() {
     // return Padding(
@@ -163,7 +169,8 @@ class _AddEditNotePageState extends State<AddEditNotePage> with WidgetsBindingOb
       description: description,
       isArchive: isArchive,
     );
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Updated!")));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text("Updated!")));
     await NotesDatabase.instance.encryptAndUpdate(note);
   }
 
@@ -183,7 +190,8 @@ class _AddEditNotePageState extends State<AddEditNotePage> with WidgetsBindingOb
     );
 
     await NotesDatabase.instance.encryptAndStore(note);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Saved!")));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text("Saved!")));
     savedOnce = true;
   }
 

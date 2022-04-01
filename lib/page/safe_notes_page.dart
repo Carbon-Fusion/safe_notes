@@ -208,12 +208,12 @@ class _NotesPageState extends State<NotesPage> {
         ),
         actions: _selectedNotesIndexList.length == 1
             ? [
-                selectedDeleteButton(),
                 selectedShareButton(),
+                selectedArchiveButton(),
                 selectedCopyButton(),
-                selectedArchiveButton()
+                selectedDeleteButton(),
               ]
-            : [selectedDeleteButton(), selectedArchiveButton()],
+            : [selectedArchiveButton(), selectedDeleteButton()],
       );
     } else {
       return AppBar(
