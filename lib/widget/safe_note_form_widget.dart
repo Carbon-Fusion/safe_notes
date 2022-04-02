@@ -36,7 +36,7 @@ class NoteFormWidget extends StatelessWidget {
         maxLines: 2,
         initialValue: title,
         enableInteractiveSelection: true,
-        autofocus: true,
+        autofocus: false,
         toolbarOptions: ToolbarOptions(
           paste: true,
           cut: true,
@@ -62,6 +62,7 @@ class NoteFormWidget extends StatelessWidget {
         maxLines: 30,
         initialValue: description,
         enableInteractiveSelection: true,
+        autofocus: true,
         toolbarOptions: ToolbarOptions(
           paste: true,
           cut: true,
