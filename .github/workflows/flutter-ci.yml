@@ -22,6 +22,15 @@ jobs:
         with:
           java-version: '12.x'
 
+      - name: Decode Keystore
+        env:
+          ENCODED_STRING: ${{ secrets.KEYSTORE }}
+        run: |
+          TMP_KEYSTORE_FILE_PATH="${RUNNER_TEMP}"/keystore
+          mkdir "${TMP_KEYSTORE_FILE_PATH}"
+          touch "${TMP_KEYSTORE_FILE_PATH}"/key.jks
+          echo $ENCODED_STRING | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"/key.jks
+          echo "${TMP_KEYSTORE_FILE_PATH}"
       # Setup the flutter environment.
       - uses: subosito/flutter-action@v1
         with:
@@ -31,11 +40,13 @@ jobs:
       # Get flutter dependencies.
       - run: flutter pub get
 
-      # Run widget tests for our flutter project.
-      - run: flutter test
-
       # Build apk.
-      - run: flutter build apk
+      - name: Build apk
+        run: flutter build apk --no-tree-shake-icons --release
+        env:
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
 
       # Upload generated apk to the artifacts.
       - uses: actions/upload-artifact@v1
