@@ -17,20 +17,22 @@ class NoteFormWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              buildTitle(),
-              SizedBox(height: 8),
-              buildDescription(),
-              SizedBox(height: 16),
-            ],
-          ),
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            buildTitle(),
+            SizedBox(height: 8),
+            buildDescription(),
+            SizedBox(height: 16),
+          ],
         ),
-      );
+      ),
+    );
+  }
 
   Widget buildTitle() => TextFormField(
         maxLines: 2,
@@ -58,26 +60,40 @@ class NoteFormWidget extends StatelessWidget {
         onChanged: onChangedTitle,
       );
 
-  Widget buildDescription() => TextFormField(
-        maxLines: 30,
-        initialValue: description,
-        enableInteractiveSelection: true,
-        autofocus: true,
-        toolbarOptions: ToolbarOptions(
-          paste: true,
-          cut: true,
-          copy: true,
-          selectAll: true,
-        ),
-        style: TextStyle(/* color: Colors.white60, */ fontSize: 18),
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: 'Type something...',
-          //hintStyle: TextStyle(color: Colors.white60),
-        ),
-        validator: (title) => title != null && title.isEmpty
-            ? 'The description cannot be empty'
-            : null,
-        onChanged: onChangedDescription,
+  Widget buildDescription() {
+    return Builder(builder: (context) {
+      return Column(
+        children: [
+          IconButton(
+              icon: Icon(Icons.undo),
+              onPressed: () {
+                Actions.invoke(
+                    context, UndoTextIntent(SelectionChangedCause.keyboard));
+              }),
+          TextFormField(
+            maxLines: 30,
+            initialValue: description,
+            enableInteractiveSelection: true,
+            autofocus: true,
+            toolbarOptions: ToolbarOptions(
+              paste: true,
+              cut: true,
+              copy: true,
+              selectAll: true,
+            ),
+            style: TextStyle(/* color: Colors.white60, */ fontSize: 18),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: 'Type something...',
+              //hintStyle: TextStyle(color: Colors.white60),
+            ),
+            validator: (title) => title != null && title.isEmpty
+                ? 'The description cannot be empty'
+                : null,
+            onChanged: onChangedDescription,
+          ),
+        ],
       );
+    });
+  }
 }
