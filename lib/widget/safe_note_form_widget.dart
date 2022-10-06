@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class NoteFormWidget extends StatefulWidget {
+class NoteFormWidget extends StatelessWidget {
   final String? title;
   final String? description;
   final String? isArchive;
@@ -17,21 +17,6 @@ class NoteFormWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<NoteFormWidget> createState() => _NoteFormWidgetState();
-}
-
-class _NoteFormWidgetState extends State<NoteFormWidget> {
-  List _undoTextHistory = <String>[];
-  List _redoTextHistory = <String>[];
-
-  TextEditingController _textController = TextEditingController();
-
-  List _undoCursorHistory = <int>[];
-  List _redoCursorHistory = <int>[];
-
-  int _undoPreNumber = 0;
-  int _undoPostNumber = 0;
-  @override
   Widget build(BuildContext context) => SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16),
@@ -39,12 +24,6 @@ class _NoteFormWidgetState extends State<NoteFormWidget> {
             mainAxisSize: MainAxisSize.min,
             children: [
               buildTitle(),
-              SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [undoButton(), redoButton()],
-              ),
               SizedBox(height: 8),
               buildDescription(),
               SizedBox(height: 16),
@@ -55,7 +34,7 @@ class _NoteFormWidgetState extends State<NoteFormWidget> {
 
   Widget buildTitle() => TextFormField(
         maxLines: 2,
-        initialValue: widget.title,
+        initialValue: title,
         enableInteractiveSelection: true,
         autofocus: false,
         toolbarOptions: ToolbarOptions(
@@ -76,14 +55,13 @@ class _NoteFormWidgetState extends State<NoteFormWidget> {
         ),
         // validator: (title) =>
         //     title != null ? 'The title cannot be empty' : null,
-        onChanged: widget.onChangedTitle,
+        onChanged: onChangedTitle,
       );
 
   Widget buildDescription() => TextFormField(
         maxLines: 30,
-        initialValue: widget.description,
+        initialValue: description,
         enableInteractiveSelection: true,
-        controller: _textController,
         autofocus: true,
         toolbarOptions: ToolbarOptions(
           paste: true,
@@ -100,73 +78,6 @@ class _NoteFormWidgetState extends State<NoteFormWidget> {
         validator: (title) => title != null && title.isEmpty
             ? 'The description cannot be empty'
             : null,
-        onChanged: (value) {
-          _undoTextHistory.add(_textController.text);
-          _undoCursorHistory.add(_textController.selection.start);
-          _redoTextHistory = [""];
-
-          widget.onChangedDescription(value);
-          setState(() {});
-        },
-      );
-
-  Widget undoButton() => IconButton(
-      icon: Icon(Icons.undo),
-      onPressed: (_undoTextHistory.length <= 1)
-          ? null
-          : () {
-              if (_undoTextHistory.length <= 1) {
-              } else {
-                _undoPreNumber = _textController.text.length;
-                _textController.text = "";
-                _textController.text =
-                    _undoTextHistory[_undoTextHistory.length - 2];
-                _undoPostNumber = _textController.text.length;
-
-                _textController.selection = TextSelection.fromPosition(
-                    TextPosition(
-                        offset:
-                            _undoCursorHistory[_undoCursorHistory.length - 1] -
-                                (_undoPreNumber - _undoPostNumber)));
-
-                _redoTextHistory
-                    .add(_undoTextHistory[_undoTextHistory.length - 1]);
-                _redoCursorHistory
-                    .add(_undoCursorHistory[_undoCursorHistory.length - 1]);
-
-                _undoTextHistory.removeAt(_undoTextHistory.length - 1);
-                _undoCursorHistory.removeAt(_undoCursorHistory.length - 1);
-
-                setState(() {});
-              }
-            });
-
-  Widget redoButton() => IconButton(
-        icon: Icon(Icons.redo),
-        onPressed: (_redoTextHistory.length <= 1)
-            ? null
-            : () {
-                if (_redoTextHistory.length <= 1) {
-                } else {
-                  _textController.text = "";
-                  _textController.text =
-                      _redoTextHistory[_redoTextHistory.length - 1];
-
-                  _textController.selection = TextSelection.fromPosition(
-                      TextPosition(
-                          offset: _redoCursorHistory[
-                              _redoCursorHistory.length - 1]));
-
-                  _undoTextHistory
-                      .add(_redoTextHistory[_redoTextHistory.length - 1]);
-                  _undoCursorHistory
-                      .add(_redoCursorHistory[_redoCursorHistory.length - 1]);
-
-                  _redoTextHistory.removeAt(_redoTextHistory.length - 1);
-                  _redoCursorHistory.removeAt(_redoCursorHistory.length - 1);
-
-                  setState(() {});
-                }
-              },
+        onChanged: onChangedDescription,
       );
 }
