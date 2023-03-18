@@ -61,37 +61,60 @@ class NoteFormWidget extends StatelessWidget {
       );
 
   Widget buildDescription() {
+    final descriptionFocus = FocusNode(debugLabel: 'descriptionFocus');
+    Widget descriptionWidget = TextFormField(
+      maxLines: 30,
+      initialValue: description,
+      enableInteractiveSelection: true,
+      autofocus: true,
+      focusNode: descriptionFocus,
+      toolbarOptions: ToolbarOptions(
+        paste: true,
+        cut: true,
+        copy: true,
+        selectAll: true,
+      ),
+      style: TextStyle(/* color: Colors.white60, */ fontSize: 18),
+      decoration: InputDecoration(
+        border: InputBorder.none,
+        hintText: 'Type something...',
+        //hintStyle: TextStyle(color: Colors.white60),
+      ),
+      validator: (title) => title != null && title.isEmpty
+          ? 'The description cannot be empty'
+          : null,
+      onChanged: onChangedDescription,
+    );
+
     return Builder(builder: (context) {
       return Column(
         children: [
-          IconButton(
-              icon: Icon(Icons.undo),
-              onPressed: () {
-                Actions.invoke(
-                    context, UndoTextIntent(SelectionChangedCause.keyboard));
-              }),
-          TextFormField(
-            maxLines: 30,
-            initialValue: description,
-            enableInteractiveSelection: true,
-            autofocus: true,
-            toolbarOptions: ToolbarOptions(
-              paste: true,
-              cut: true,
-              copy: true,
-              selectAll: true,
-            ),
-            style: TextStyle(/* color: Colors.white60, */ fontSize: 18),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: 'Type something...',
-              //hintStyle: TextStyle(color: Colors.white60),
-            ),
-            validator: (title) => title != null && title.isEmpty
-                ? 'The description cannot be empty'
-                : null,
-            onChanged: onChangedDescription,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                  icon: Icon(Icons.undo),
+                  onPressed: () {
+                    try {
+                      Actions.invoke(descriptionFocus.context!,
+                          UndoTextIntent(SelectionChangedCause.keyboard));
+                    } catch (e) {
+                      print(e.toString());
+                    }
+                  }),
+              IconButton(
+                  icon: Icon(Icons.redo),
+                  onPressed: () {
+                    try {
+                      Actions.invoke(descriptionFocus.context!,
+                          RedoTextIntent(SelectionChangedCause.keyboard));
+                    } catch (e) {
+                      print(e.toString());
+                    }
+                  }),
+            ],
           ),
+          descriptionWidget,
         ],
       );
     });
