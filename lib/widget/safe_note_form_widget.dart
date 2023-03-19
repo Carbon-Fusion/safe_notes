@@ -6,6 +6,8 @@ class NoteFormWidget extends StatelessWidget {
   final String? isArchive;
   final ValueChanged<String> onChangedTitle;
   final ValueChanged<String> onChangedDescription;
+  final FocusNode titleFocus;
+  final FocusNode descriptionFocus;
 
   const NoteFormWidget({
     Key? key,
@@ -14,6 +16,8 @@ class NoteFormWidget extends StatelessWidget {
     this.isArchive = '',
     required this.onChangedTitle,
     required this.onChangedDescription,
+    required this.titleFocus,
+    required this.descriptionFocus,
   }) : super(key: key);
 
   @override
@@ -39,6 +43,7 @@ class NoteFormWidget extends StatelessWidget {
         initialValue: title,
         enableInteractiveSelection: true,
         autofocus: false,
+        focusNode: titleFocus,
         toolbarOptions: ToolbarOptions(
           paste: true,
           cut: true,
@@ -61,8 +66,7 @@ class NoteFormWidget extends StatelessWidget {
       );
 
   Widget buildDescription() {
-    final descriptionFocus = FocusNode(debugLabel: 'descriptionFocus');
-    Widget descriptionWidget = TextFormField(
+    return TextFormField(
       maxLines: 30,
       initialValue: description,
       enableInteractiveSelection: true,
@@ -70,7 +74,6 @@ class NoteFormWidget extends StatelessWidget {
       focusNode: descriptionFocus,
       toolbarOptions: ToolbarOptions(
         paste: true,
-        cut: true,
         copy: true,
         selectAll: true,
       ),
@@ -85,38 +88,5 @@ class NoteFormWidget extends StatelessWidget {
           : null,
       onChanged: onChangedDescription,
     );
-
-    return Builder(builder: (context) {
-      return Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                  icon: Icon(Icons.undo),
-                  onPressed: () {
-                    try {
-                      Actions.invoke(descriptionFocus.context!,
-                          UndoTextIntent(SelectionChangedCause.keyboard));
-                    } catch (e) {
-                      print(e.toString());
-                    }
-                  }),
-              IconButton(
-                  icon: Icon(Icons.redo),
-                  onPressed: () {
-                    try {
-                      Actions.invoke(descriptionFocus.context!,
-                          RedoTextIntent(SelectionChangedCause.keyboard));
-                    } catch (e) {
-                      print(e.toString());
-                    }
-                  }),
-            ],
-          ),
-          descriptionWidget,
-        ],
-      );
-    });
   }
 }

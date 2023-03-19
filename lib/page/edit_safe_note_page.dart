@@ -25,6 +25,8 @@ class _AddEditNotePageState extends State<AddEditNotePage>
   late String description;
   late String isArchive;
   final String ZWSP = '​';
+  final titleFocus = FocusNode(debugLabel: "titleFocus");
+  final descriptionFocus = FocusNode(debugLabel: 'descriptionFocus');
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -56,36 +58,75 @@ class _AddEditNotePageState extends State<AddEditNotePage>
   }
 
   @override
-  Widget build(BuildContext context) => WillPopScope(
-        onWillPop: () async {
-          usableCheck();
-          return true;
-        },
-        child: GestureDetector(
-            onTap: () => FocusScope.of(context).unfocus(),
-            child: Scaffold(
-              appBar: AppBar(
-                actions: [
-                  shareButton(),
-                  buildButton(),
-                  copyButton(),
-                  deleteButton(),
-                ],
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        usableCheck();
+        return true;
+      },
+      child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Scaffold(
+            appBar: AppBar(
+              actions: [
+                shareButton(),
+                buildButton(),
+                copyButton(),
+                deleteButton(),
+              ],
+            ),
+            body: Form(
+              key: _formKey,
+              child: NoteFormWidget(
+                title: title,
+                isArchive: isArchive,
+                description: description,
+                onChangedTitle: (title) => setState(() => this.title = title),
+                onChangedDescription: (description) =>
+                    setState(() => this.description = description),
+                titleFocus: titleFocus,
+                descriptionFocus: descriptionFocus,
               ),
-              body: Form(
-                key: _formKey,
-                child: NoteFormWidget(
-                  title: title,
-                  isArchive: isArchive,
-                  description: description,
-                  onChangedTitle: (title) => setState(() => this.title = title),
-                  onChangedDescription: (description) =>
-                      setState(() => this.description = description),
-                ),
-              ),
-            )),
-      );
+            ),
+          )),
+    );
+  }
 
+  Widget undoButton(){
+    return IconButton(
+        icon: Icon(Icons.undo),
+        onPressed: () {
+          try {
+            if(descriptionFocus.hasFocus) {
+              Actions.invoke(descriptionFocus.context!,
+                  UndoTextIntent(SelectionChangedCause.keyboard));
+            }else{
+              Actions.invoke(titleFocus.context!,
+                  UndoTextIntent(SelectionChangedCause.keyboard));
+            }
+          } catch (e) {
+            print(e.toString());
+          }
+        });
+  }
+
+  Widget redoButton(){
+    return IconButton(
+        icon: Icon(Icons.redo),
+        onPressed: () {
+          try {
+            if(descriptionFocus.hasFocus) {
+              Actions.invoke(descriptionFocus.context!,
+                  RedoTextIntent(SelectionChangedCause.keyboard));
+            }else{
+              Actions.invoke(titleFocus.context!,
+                  RedoTextIntent(SelectionChangedCause.keyboard));
+            }
+          } catch (e) {
+            print(e.toString());
+          }
+        });
+  }
   Widget buildButton() {
     // return Padding(
     //   padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
