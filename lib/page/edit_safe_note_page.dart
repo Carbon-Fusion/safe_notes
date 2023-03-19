@@ -69,12 +69,12 @@ class _AddEditNotePageState extends State<AddEditNotePage>
           child: Scaffold(
             appBar: AppBar(
               actions: [
+                undoButton(),
+                redoButton(),
                 shareButton(),
                 buildButton(),
                 copyButton(),
                 deleteButton(),
-                undoButton(),
-                redoButton(),
               ],
             ),
             body: Form(
