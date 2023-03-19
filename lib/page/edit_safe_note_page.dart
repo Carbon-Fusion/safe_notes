@@ -73,6 +73,8 @@ class _AddEditNotePageState extends State<AddEditNotePage>
                 buildButton(),
                 copyButton(),
                 deleteButton(),
+                undoButton(),
+                redoButton(),
               ],
             ),
             body: Form(
