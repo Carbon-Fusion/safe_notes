@@ -168,7 +168,7 @@ class _AddEditNotePageState extends State<AddEditNotePage>
         });
       });
   bool isFormValid() {
-    return description.isNotEmpty;
+    return description.isNotEmpty || title.isNotEmpty;
   }
 
   void startFixTitle() {
@@ -193,9 +193,6 @@ class _AddEditNotePageState extends State<AddEditNotePage>
   }
 
   void addOrUpdateNote() async {
-    final isValid = _formKey.currentState!.validate();
-
-    if (isValid) {
       final isUpdating = widget.note != null || savedOnce;
 
       if (isUpdating) {
@@ -203,7 +200,6 @@ class _AddEditNotePageState extends State<AddEditNotePage>
       } else {
         await addNote();
       }
-    }
   }
 
   Future updateNote() async {
