@@ -29,7 +29,7 @@ class AppThemes {
         FloatingActionButtonThemeData(backgroundColor: Colors.grey),
     colorScheme: ColorScheme.dark(primary: Colors.blue)
         .copyWith(
-            primaryContainer: Colors.grey, background: const Color(0xFF212121))
+            primaryContainer: Colors.grey, surface: const Color(0xFF212121))
         .copyWith(secondary: Colors.white),
   );
 
@@ -44,7 +44,7 @@ class AppThemes {
     ),
     colorScheme: ColorScheme.light(primary: const Color(0xff303F9F))
         .copyWith(
-            primaryContainer: Colors.grey, background: const Color(0xFFE5E5E5))
+            primaryContainer: Colors.grey, surface: const Color(0xFFE5E5E5))
         .copyWith(secondary: Colors.black),
   );
 }

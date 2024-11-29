@@ -44,7 +44,7 @@ class _AddEditNotePageState extends State<AddEditNotePage>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     title = widget.note?.title ?? '';
     title = emptyTitle(title);
     description = widget.note?.description ?? '';
@@ -53,7 +53,7 @@ class _AddEditNotePageState extends State<AddEditNotePage>
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 

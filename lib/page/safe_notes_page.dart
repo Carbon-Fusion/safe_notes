@@ -575,7 +575,7 @@ class _NotesPageState extends State<NotesPage> {
                           child: Text('Unencrypted (Unsecure)'),
                           style: ButtonStyle(
                               //Highlight dangers of insecure export
-                              backgroundColor: MaterialStateProperty.all<Color>(
+                              backgroundColor: WidgetStateProperty.all<Color>(
                                   Colors.redAccent.shade700)),
                           onPressed: () {
                             ExportEncryptionControl.setIsExportEncrypted(false);
